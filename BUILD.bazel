@@ -1,7 +1,7 @@
 load("@npm//@bazel/typescript:index.bzl", "ts_project")
 load("@npm//http-server:index.bzl", "http_server")
 load("@npm//sass:index.bzl", "sass")
-load("@npm//webpack-cli:index.bzl", webpack = "webpack_cli")
+load("@npm//@bazel/esbuild:index.bzl", "esbuild")
 
 sass(
     name = "styles",
@@ -14,6 +14,7 @@ sass(
 )
 
 ts_project(
+    name = "lib",
     # Experimental: Start a tsc daemon to watch for changes to make recompiles faster.
     supports_workers = True,
     deps = [
@@ -22,25 +23,22 @@ ts_project(
     ],
 )
 
-webpack(
+esbuild(
     name = "bundle",
-    outs = ["app.bundle.js"],
-    args = [
-        "$(execpath index.js)",
-        "--config",
-        "$(execpath webpack.config.js)",
-        "-o",
-        "$@",
-    ],
-    data = [
+    entry_point = "index.tsx",
+    minify = True,
+    output = "app.bundle.js",
+    srcs = [
         "index.js",
         "styles.css",
         "webpack.config.js",
+    ],
+    deps = [
+        ":lib",
         "@npm//:node_modules",
     ],
 )
 
-# Note, on Windows you need `--enable_runfiles`
 http_server(
     name = "server",
     data = [

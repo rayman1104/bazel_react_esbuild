@@ -1,4 +1,4 @@
-workspace(name = "react_webpack")
+workspace(name = "react_esbuild")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -19,4 +19,10 @@ yarn_install(
     name = "npm",
     package_json = "//:package.json",
     yarn_lock = "//:yarn.lock",
+)
+
+load("@build_bazel_rules_nodejs//toolchains/esbuild:esbuild_repositories.bzl", "esbuild_repositories")
+
+esbuild_repositories(
+    npm_repository = "npm",
 )
