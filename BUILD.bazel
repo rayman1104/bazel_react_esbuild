@@ -1,7 +1,7 @@
 load("@npm//@bazel/typescript:index.bzl", "ts_project")
 load("@npm//http-server:index.bzl", "http_server")
 load("@npm//sass:index.bzl", "sass")
-load("@npm//@bazel/esbuild:index.bzl", "esbuild")
+load("@npm//@bazel/esbuild:index.bzl", "esbuild", "esbuild_config")
 
 sass(
     name = "styles",
@@ -15,7 +15,6 @@ sass(
 
 ts_project(
     name = "lib",
-    # Experimental: Start a tsc daemon to watch for changes to make recompiles faster.
     supports_workers = True,
     deps = [
         "@npm//@types",
@@ -23,15 +22,23 @@ ts_project(
     ],
 )
 
+esbuild_config(
+    name = "esbuild_config",
+    config_file = "esbuild.config.mjs",
+    deps = [
+        "@npm//esbuild-css-modules-plugin",
+    ],
+)
+
 esbuild(
     name = "bundle",
     entry_point = "index.tsx",
     minify = True,
-    output = "app.bundle.js",
+    config = ":esbuild_config",
+    output_dir = True,
     srcs = [
         "index.js",
         "styles.css",
-        "webpack.config.js",
     ],
     deps = [
         ":lib",
@@ -42,8 +49,8 @@ esbuild(
 http_server(
     name = "server",
     data = [
-        "app.bundle.js",
         "index.html",
+        ":bundle",
     ],
     templated_args = ["."],
 )
