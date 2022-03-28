@@ -18,6 +18,7 @@ ts_project(
     supports_workers = True,
     deps = [
         "@npm//@types",
+        "@npm//antd",
         "@npm//csstype",
     ],
 )
