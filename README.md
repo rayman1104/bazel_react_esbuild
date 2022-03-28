@@ -11,23 +11,3 @@ CSS Modules don't work as expected right now. See issue https://github.com/evanw
 ```bash
 $ bazel run //:server
 ```
-
-## CSS Modules issue
-
-Works:
-```tsx
-import "./styles.css";
-ReactDOM.render(
-  <h1 className="h1">Hello, world!</h1>,
-  document.getElementById("root")
-);
-```
-
-Doesn't work:
-```tsx
-import * as styles from "./styles.css";
-ReactDOM.render(
-  <h1 className={styles.h1}>Hello, world!</h1>,
-  document.getElementById("root")
-);
-```

@@ -6,12 +6,12 @@ load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 sass(
     name = "styles",
-    outs = ["styles.css"],
+    outs = ["styles.module.css"],
     args = [
-        "$(execpath styles.scss)",
-        "$(execpath styles.css)",
+        "$(execpath styles.module.scss)",
+        "$(execpath styles.module.css)",
     ],
-    data = ["styles.scss"],
+    data = ["styles.module.scss"],
 )
 
 ts_project(
@@ -36,19 +36,19 @@ esbuild_config(
     config_file = "esbuild.config.mjs",
     deps = [
         ":esbuild_plugin_import",
-        "@npm//esbuild-css-modules-plugin",
+        "@npm//esbuild-plugin-css-modules",
     ],
 )
 
 esbuild(
     name = "bundle",
     entry_point = "index.tsx",
-    minify = True,
+    minify = False,
     config = ":esbuild_config",
     output_dir = True,
     srcs = [
         "index.js",
-        "styles.css",
+        "styles.module.css",
     ],
     deps = [
         ":lib",
