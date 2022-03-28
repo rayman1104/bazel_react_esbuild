@@ -1,8 +1,10 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
+load("@npm//@babel/cli:index.bzl", "babel")
+load("@npm//@bazel/terser:index.bzl", "terser_minified")
+load("@npm//@bazel/esbuild:index.bzl", "esbuild", "esbuild_config")
 load("@npm//@bazel/typescript:index.bzl", "ts_project")
 load("@npm//http-server:index.bzl", "http_server")
 load("@npm//sass:index.bzl", "sass")
-load("@npm//@bazel/esbuild:index.bzl", "esbuild", "esbuild_config")
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 sass(
     name = "styles",
@@ -41,11 +43,12 @@ esbuild_config(
 )
 
 esbuild(
-    name = "bundle",
+    name = "bundle-es2015",
     entry_point = "index.tsx",
     minify = False,
     config = ":esbuild_config",
     output_dir = True,
+    splitting = True,
     srcs = [
         "index.js",
         "styles.module.css",
@@ -56,11 +59,38 @@ esbuild(
     ],
 )
 
+babel(
+    name = "bundle-es5",
+    args = [
+        "$(locations :bundle-es2015)",
+        "--no-babelrc",
+        "--source-maps",
+        "--out-dir",
+        "$(@D)",
+    ],
+    data = [
+        ":bundle-es2015",
+    ],
+    output_dir = True,
+)
+
+terser_minified(
+    name = "bundle-es2015.min",
+    src = ":bundle-es2015",
+)
+
+terser_minified(
+    name = "bundle-es5.min",
+    src = ":bundle-es5",
+)
+
 http_server(
     name = "server",
     data = [
         "index.html",
-        ":bundle",
+        ":bundle-es2015",
+        ":bundle-es5.min",
+        ":bundle-es2015.min",
     ],
     templated_args = ["."],
 )
