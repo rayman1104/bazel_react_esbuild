@@ -2,6 +2,7 @@ load("@npm//@bazel/typescript:index.bzl", "ts_project")
 load("@npm//http-server:index.bzl", "http_server")
 load("@npm//sass:index.bzl", "sass")
 load("@npm//@bazel/esbuild:index.bzl", "esbuild", "esbuild_config")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 sass(
     name = "styles",
@@ -23,10 +24,18 @@ ts_project(
     ],
 )
 
+copy_to_bin(
+    name = "esbuild_plugin_import",
+    srcs = [
+        "esbuild-plugin-import.mjs",
+    ]
+)
+
 esbuild_config(
     name = "esbuild_config",
     config_file = "esbuild.config.mjs",
     deps = [
+        ":esbuild_plugin_import",
         "@npm//esbuild-css-modules-plugin",
     ],
 )

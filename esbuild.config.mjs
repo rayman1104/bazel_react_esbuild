@@ -1,5 +1,5 @@
 import { default as cssModulesPlugin } from "esbuild-css-modules-plugin";
-
+import { default as esbuildPluginImport } from "./esbuild-plugin-import.mjs";
 
 export default {
     plugins: [
@@ -15,5 +15,6 @@ export default {
             localsConvention: 'camelCaseOnly', // optional. value could be one of 'camelCaseOnly', 'camelCase', 'dashes', 'dashesOnly', default is 'camelCaseOnly'
             v2: true,
         }),
+        esbuildPluginImport([{ libraryName: 'antd' }]),
     ],
 }
